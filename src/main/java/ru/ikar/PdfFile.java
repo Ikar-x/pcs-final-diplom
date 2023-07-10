@@ -12,7 +12,7 @@ public class PdfFile {
     private String name;
     private Map<String, Integer> indexWorldsInFile = new HashMap<>();
 
-    int contPages = 1;
+    private int contPages = 1;
 
     PdfFile (String path){
         name = path;
