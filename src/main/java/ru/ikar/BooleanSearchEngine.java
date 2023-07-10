@@ -10,11 +10,16 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BooleanSearchEngine implements SearchEngine {
 
-    List<PdfFile> allPdfFiles = new ArrayList<>();
-    List<File> fileNames = new ArrayList<>();
+    private List<PdfFile> allPdfFiles = new ArrayList<>();
+    private List<File> fileNames = new ArrayList<>();
+    private Map<String, Integer> mapCollect = new HashMap<>();
+    private Map<String, List<PageEntry>> mapResult = new HashMap<>();
+
 
     public BooleanSearchEngine(File pdfsDir) throws IOException {
         // прочтите тут все pdf и сохраните нужные данные,
@@ -38,13 +43,19 @@ public class BooleanSearchEngine implements SearchEngine {
                 page.indexPage();
                 pdfFile.addPage(page);
             }
+            pdfFile.indexingFile();
+            mapCollect = Stream.of(mapCollect, pdfFile.getIndexWorldsInFile())
+                    .flatMap(m -> m.entrySet().stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue + newValue));
         }
-
+        for (Map.Entry<String, Integer> entry : mapCollect.entrySet()) {
+            String key = entry.getKey();
+            mapResult.put(key, buildEntries(key));
+        }
 
     }
 
-    @Override
-    public List<PageEntry> search(String word) {
+    public List<PageEntry> buildEntries(String word) {
         List<PageEntry> entries = new ArrayList<>();
         for(PdfFile pdf : allPdfFiles){
             List<PageEntry> entriesFromPage = pdf.getEntries(word);
@@ -54,5 +65,10 @@ public class BooleanSearchEngine implements SearchEngine {
         }
         Collections.sort(entries);
         return entries;
+    }
+
+    @Override
+    public List<PageEntry> search(String word) {
+        return mapResult.get(word);
     }
 }

@@ -4,7 +4,7 @@ import java.util.*;
 
 public class MyPdfPage {
     private String text;
-    Map<String, Integer> indexWorldsInPage = new HashMap<>();
+    private Map<String, Integer> indexWorldsInPage = new HashMap<>();
     private int number;
 
     MyPdfPage(String text, int number){

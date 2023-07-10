@@ -1,11 +1,16 @@
 package ru.ikar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PdfFile {
     private List<MyPdfPage> pages = new ArrayList<>();
     private String name;
+    private Map<String, Integer> indexWorldsInFile = new HashMap<>();
 
     int contPages = 1;
 
@@ -30,5 +35,17 @@ public class PdfFile {
             }
         }
         return entries;
+    }
+
+    public void indexingFile(){
+        for(MyPdfPage pages : this.pages){
+            indexWorldsInFile = Stream.of(indexWorldsInFile, pages.getIndexWorldsInPage())
+                    .flatMap(m -> m.entrySet().stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue + newValue));
+        }
+    }
+
+    public Map<String, Integer> getIndexWorldsInFile() {
+        return indexWorldsInFile;
     }
 }

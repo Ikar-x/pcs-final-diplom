@@ -21,7 +21,7 @@ public class Main {
                         PrintWriter out = new PrintWriter(socket.getOutputStream());
                 ) {
                     String word = in.readLine();
-                    String s = gson.toJson(engine.search(word));
+                    String s = gson.toJson(engine.search(word.toLowerCase()));
                     out.println(s);
                 }
             }
